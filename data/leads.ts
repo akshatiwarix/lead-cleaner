@@ -142,10 +142,14 @@ const MERGES: Lead[] = [
 // ---------------------------------------------------------------------------
 
 const HARD_NEGATIVES: Lead[] = [
-  // A father and son at one company. Same name, same employer, same domain. The
-  // generational suffix is the only field in either row that says two people.
+  // A father and son at one company, sharing the office line — a family firm, and
+  // entirely ordinary. Name, employer, domain and phone all agree, which makes
+  // this pair *authoritative* on the phone rule. The generational suffix is the
+  // only field that disagrees, and it has to be enough to override the merge:
+  // this is the dataset's proof that refusals are evaluated before the
+  // authoritative tier rather than after it.
   { id: "r043", truePersonId: "p021", scenario: "hard-negative-father-and-son", fullName: "Robert Reyes Sr.", email: "robert.reyes@acme.example", phone: "(555) 019-1021", company: "Acme Robotics", title: "Founder", source: "crm-export", updatedAt: "2026-02-18" },
-  { id: "r044", truePersonId: "p022", scenario: "hard-negative-father-and-son", fullName: "Robert Reyes Jr.", email: "rob.reyes@acme.example", phone: "(555) 019-1022", company: "Acme Robotics", title: "Head of Product", source: "crm-export", updatedAt: "2026-02-18" },
+  { id: "r044", truePersonId: "p022", scenario: "hard-negative-father-and-son", fullName: "Robert Reyes Jr.", email: "rob.reyes@acme.example", phone: "555-019-1021", company: "Acme Robotics", title: "Head of Product", source: "crm-export", updatedAt: "2026-02-18" },
 
   // Two Wei Chens at one company. Nothing refutes the pair and nothing confirms
   // it — exactly the case a human has to rule on.
