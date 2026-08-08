@@ -57,22 +57,38 @@ export type InputRow = {
 export type NormNote = { rule: string; from: string; to: string };
 
 /**
- * How much an email address is allowed to mean. `personal` is the only kind
- * that can carry identity on its own: a shared `info@` address is the most
- * common false-merge source in real CRM data, and free-mail addresses say
- * nothing about which company someone works at.
+ * How much an email address is allowed to mean. Two different questions hang
+ * off this and they have different answers:
+ *
+ * *Does it identify a person?* `personal` and `freemail` do — both are one
+ * human's mailbox, so two records sharing either are the same human. `role`
+ * does not: `info@acme.example` is a shared inbox, and treating it as identity
+ * is the most common false-merge source in real CRM data.
+ *
+ * *Does it identify a company?* Only `personal`. A `gmail.com` address says
+ * nothing about where someone works, which is why `freemail` is a kind of its
+ * own rather than folded into `personal`.
  */
 export type EmailKind = "personal" | "role" | "freemail" | "invalid" | "missing";
 
 export type NormalizedName = {
+  /** Match forms: lower-cased, unaccented, honorific and suffix removed. */
   first?: string;
   last?: string;
   honorific?: string;
+  /**
+   * `jr`, `iii`, `sr`. Kept rather than discarded — a generational suffix is the
+   * only thing distinguishing a father and son who share a name and a company,
+   * and that pair is in the dataset precisely because it is where deduplicators
+   * merge two people.
+   */
   suffix?: string;
-  /** Nickname resolved to its canonical form: `Bob` -> `robert`. */
+  /** The formal name, when the variant table admits exactly one: `Bob` -> `robert`. */
   firstCanonical?: string;
   /** Phonetic key on the surname, used for blocking. */
   lastKey?: string;
+  /** Human-facing form, rebuilt rather than passed through: `Robert Reyes Jr.` */
+  display?: string;
   notes: NormNote[];
 };
 
@@ -115,8 +131,8 @@ export type NormalizedRecord = {
   /** Day 011 owns titles. Here they are tidied for display and nothing else. */
   title: { raw?: string; tidied?: string };
   source?: string;
+  /** ISO `YYYY-MM-DD`, or absent when the input date could not be read. */
   updatedAt?: string;
-  blockKeys: string[];
 };
 
 // ---------------------------------------------------------------------------

@@ -92,9 +92,13 @@ These are the project's claims. Breaking one silently invalidates the README.
    review item. The whole design follows from that asymmetry.
 2. **Auto-tier precision is 1.0** on the labelled dataset. If that test fails,
    an authoritative rule is wrong — fix the rule, not the test.
-3. **Role addresses are not identity.** `info@`, `sales@`, `hello@` and
-   free-mail addresses never satisfy the authoritative email rule. This is the
-   most common false-merge source in real CRM data.
+3. **Role addresses are not identity.** `info@`, `sales@`, `hello@` never
+   satisfy the authoritative email rule — a shared inbox is three people, and
+   merging on one is the most common false merge in real CRM data. Free-mail is
+   a *separate* question and the two get conflated constantly: `bob@gmail.com`
+   is one human's mailbox, so it does identify a person. What it does not
+   identify is an employer, which is why `EmailKind` keeps `freemail` distinct
+   from `personal` and only `personal` may supply a company domain.
 4. **Refusals are evaluated first and win outright**, including human
    `must-not-link`. A union that would violate one is recorded as refused, never
    silently performed.
