@@ -23,7 +23,7 @@ import { describe, expect, it } from "vitest";
  * Grown as the engine lands, deliberately by hand: an explicit list fails loudly
  * when a directory is renamed, where a glob would just quietly check less.
  */
-const ENGINE_DIRECTORIES = ["lib/clean", "lib/match", "lib/normalize", "lib/survive", "lib/text"];
+const ENGINE_DIRECTORIES = ["lib/clean", "lib/csv", "lib/export", "lib/match", "lib/normalize", "lib/survive", "lib/text"];
 
 const FORBIDDEN: { pattern: RegExp; why: string }[] = [
   { pattern: /Math\.random\s*\(/, why: "unseeded randomness makes a run impossible to reproduce" },
