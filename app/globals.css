@@ -1,26 +1,48 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * `dark:` responds to the OS setting *and* to a `.dark` class on <html>, so dark
+ * mode can be exercised deliberately from a console instead of only by changing
+ * system preferences.
+ */
+@custom-variant dark {
+  @media (prefers-color-scheme: dark) {
+    @slot;
+  }
+  &:where(.dark, .dark *) {
+    @slot;
+  }
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+body {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+ * Dragging the threshold changes several numbers at once, and a value that jumps
+ * without a moment of emphasis is a value the eye misses. Short enough not to lag
+ * behind the slider.
+ */
+@keyframes bump {
+  from {
+    color: var(--color-sky-600);
+  }
+  to {
+    color: inherit;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.bumped {
+  animation: bump 500ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bumped {
+    animation: none;
+  }
 }
