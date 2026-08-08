@@ -165,5 +165,18 @@ Out of scope, each belonging to a later day or a documented next step in
 
 Vercel, default Node runtime, no configuration and no environment variables.
 Nothing is deployed and no git remote is changed without an explicit go-ahead.
-Remote: `github.com/akshatiwarix/lead-cleaner`. The build is pushed after every
-completed step in `PLAN.md`'s task order, each one green on the gate first.
+Remote: `github.com/akshatiwarix/lead-cleaner` (public).
+
+Production: **https://lead-cleaner-smoky.vercel.app**. Note the suffix —
+`lead-cleaner.vercel.app` is taken by an unrelated project, so Vercel assigned
+the `-smoky` alias. Do not "fix" the README link to the shorter name; it serves
+somebody else's default Next.js page.
+
+The project inherits Day 002's protection setting
+(`ssoProtection: all_except_custom_domains`), which gates the
+deployment-specific URL but exempts the project alias. So the alias above is
+public while `lead-cleaner-<hash>-akshat-tiwarix.vercel.app` returns 401 — that
+is expected, not a misconfiguration.
+
+Deploy with `vercel --prod --yes`. The build is pushed after every completed step
+in `PLAN.md`'s task order, each one green on the gate first.

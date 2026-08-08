@@ -3,7 +3,7 @@
 Record linkage for messy lead and CRM data: tiered matching, constrained clustering, and a
 field-level receipt for every merge.
 
-[Live demo](https://lead-cleaner.vercel.app) · [Demo GIF](docs/demo.gif) · [Plain-English guide](docs/plain-english-guide.md)
+[Live demo](https://lead-cleaner-smoky.vercel.app) · [Demo GIF](docs/demo.gif) · [Plain-English guide](docs/plain-english-guide.md)
 
 ![Working the review queue and dragging the threshold](docs/demo.gif)
 
