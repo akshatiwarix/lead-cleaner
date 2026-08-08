@@ -88,9 +88,26 @@ describe("the automatic tier holds precision 1.0", () => {
     expect(truth.autoRecall).toBeGreaterThan(0.9);
     // The pairs it did not merge are the ones it is asking about, not ones it lost.
     expect(truth.withReviewRecall).toBe(1);
-    // And accepting the whole queue blindly would cost precision — the gap between
-    // these two numbers is the work the review queue is asking a human to do.
-    expect(truth.withReviewPrecision).toBeLessThan(1);
+  });
+
+  it("is calibrated so the default queue is safe to accept, and lowering it is not", () => {
+    // This is what the sweep bought. At the shipped threshold the queue contains
+    // only real duplicates, so a reviewer who accepts all of it lands on perfect
+    // precision and perfect recall — the default asks for the least work that still
+    // reaches a complete answer.
+    expect(result.metrics.groundTruth!.withReviewPrecision).toBe(1);
+    expect(result.metrics.groundTruth!.withReviewRecall).toBe(1);
+
+    // Lower it and the queue starts including pairs that have to be rejected. The
+    // number falling is the whole reason the queue is a queue and not an automatic
+    // merge — and it is what dragging the slider in the UI shows.
+    const loose = clean(rows, { ...DEFAULT_CONFIG, reviewThreshold: 0.6 });
+    expect(loose.metrics.pendingReview).toBeGreaterThan(result.metrics.pendingReview);
+    expect(loose.metrics.groundTruth!.withReviewPrecision).toBeLessThan(1);
+
+    // What does not move: the automatic tier never reads the threshold.
+    expect(loose.metrics.groundTruth!.autoPrecision).toBe(1);
+    expect(loose.metrics.autoMerged).toBe(result.metrics.autoMerged);
   });
 });
 

@@ -4,7 +4,7 @@ import type { CleanConfig, InputRow, NormalizedRecord } from "../clean/types.ts"
 
 /** The shipped defaults, so tests measure what a user would see. */
 export const CONFIG: CleanConfig = {
-  reviewThreshold: 0.75,
+  reviewThreshold: 0.85,
   nameGate: 0.8,
   sourceTrust: ["crm-export", "enrichment", "form-fill", "event-list", "purchased-list"],
   blocking: true,

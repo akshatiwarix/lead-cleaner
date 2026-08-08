@@ -7,7 +7,7 @@ Framework-specific rules live in `AGENTS.md` (written and maintained by
 
 ## Project state
 
-Day 003 of a 100-day building challenge, **in progress**. `PLAN.md` is the
+Day 003 of a 100-day building challenge, **shipped**. `PLAN.md` is the
 agreed scope and the source of truth: it came out of a decision-by-decision
 interview, so every choice in it is deliberate rather than a default. Read it
 before writing code, and do not quietly widen the MVP.
@@ -73,6 +73,11 @@ a run replayable by someone who wasn't there; the constraint set serialises into
 vendors. Here determinism is structural. A run is identified by `runHash` — a
 hash of config + constraints + input ids. Do not introduce a seed input.
 
+**The default run happens in the browser.** `app/components/CleanerConsole.tsx`
+calls `clean()` directly, which is what makes the "your CSV never leaves your
+machine" claim true. `/api/clean` exists for scripting and calls the same
+function.
+
 **Order independence is structural, not incidental.** Pair keys are canonical
 (`a < b`), cluster ids derive from the lowest member id, and every returned
 collection is sorted. If you add a collection to `CleanResult`, sort it.
@@ -124,6 +129,14 @@ precision/recall figures all come from real runs over `data/leads.ts`. **If you
 change a weight, a threshold, a normalization rule or the dataset, rerun
 `npm run sweep` and update the README tables** — otherwise the prose starts
 lying and only a reader will notice. Tests assert the shape of those claims.
+
+Current: 150 rows to 100 people, auto precision 1.000, auto recall 0.958, a
+two-item queue that reaches 1.000, 91 comparisons against 10,296 exhaustive
+(113x), 6 quarantined, 44 flagged conflicts, 318 tests.
+
+`reviewThreshold` is 0.85 **because the sweep says so** — it is the lowest value
+whose queue still contains only true pairs. Do not nudge it without rerunning
+`npm run sweep` and updating the README's calibration table and its bolded row.
 
 ## Data
 
