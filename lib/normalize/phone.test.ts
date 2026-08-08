@@ -87,7 +87,13 @@ describe("normalizePhone", () => {
   it("reports a missing or digitless value as invalid, with a reason", () => {
     expect(normalizePhone(undefined, "US").valid).toBe(false);
     expect(normalizePhone("", "US").valid).toBe(false);
-    const junk = normalizePhone("n/a", "US");
+    // A placeholder is caught before the digit scan, and says so — `n/a` is a
+    // field someone left blank, not a number that failed to parse.
+    const placeholder = normalizePhone("n/a", "US");
+    expect(placeholder.valid).toBe(false);
+    expect(placeholder.notes[0].rule).toContain("placeholder");
+
+    const junk = normalizePhone("call the switchboard", "US");
     expect(junk.valid).toBe(false);
     expect(junk.notes.some((note) => note.rule.includes("no digits"))).toBe(true);
   });

@@ -14,6 +14,7 @@
  * collapse a parent into its subsidiary. Those stay.
  */
 
+import { isPlaceholder } from "./placeholder.ts";
 import type { NormalizedCompany, NormNote } from "../clean/types.ts";
 
 /**
@@ -94,6 +95,10 @@ export function normalizeCompany(raw?: string): NormalizedCompany {
   const notes: NormNote[] = [];
   const input = (raw ?? "").trim();
   if (input.length === 0) return { notes };
+  if (isPlaceholder(input)) {
+    notes.push({ rule: "dropped a placeholder standing in for a missing company", from: input, to: "" });
+    return { notes };
+  }
 
   const folded = fold(input);
   if (folded !== input) {

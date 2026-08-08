@@ -17,14 +17,9 @@ import { normalizeDomain } from "./domain.ts";
 import { normalizeEmail } from "./email.ts";
 import { normalizeName } from "./name.ts";
 import { normalizePhone } from "./phone.ts";
+import { orAbsent } from "./placeholder.ts";
 import { normalizeTimestamp } from "./timestamp.ts";
 
-/**
- * Titles get case and whitespace and nothing else. Seniority and function
- * extraction is Day 011 (`title-normalizer`); doing it here would be a second
- * project's worth of rules hiding inside this one, and the title never enters a
- * match decision.
- */
 /** Lower-cased inside a title rather than capitalised. */
 const TITLE_STOPWORDS = new Set([
   "of", "the", "and", "for", "to", "at", "in", "on", "a", "an", "or", "de",
@@ -33,8 +28,14 @@ const TITLE_STOPWORDS = new Set([
 /** Acronyms long enough that the length heuristic would title-case them. */
 const LONGER_ACRONYMS = new Set(["ciso", "revops", "saas", "paas", "iaas", "b2b", "b2c", "erp", "crm"]);
 
+/**
+ * Titles get case and whitespace and nothing else. Seniority and function
+ * extraction is Day 011 (`title-normalizer`); doing it here would be a second
+ * project's worth of rules hiding inside this one, and the title never enters a
+ * match decision.
+ */
 function tidyTitle(raw?: string): { raw?: string; tidied?: string } {
-  const input = (raw ?? "").trim().replace(/\s+/g, " ");
+  const input = (orAbsent(raw) ?? "").trim().replace(/\s+/g, " ");
   if (input.length === 0) return {};
 
   // Only shouted titles get rewritten; a title someone cased deliberately is
@@ -64,7 +65,7 @@ function tidyTitle(raw?: string): { raw?: string; tidied?: string } {
 
 /** Source labels are compared against `config.sourceTrust`, so they need one spelling. */
 function normalizeSource(raw?: string): string | undefined {
-  const input = (raw ?? "").trim().toLowerCase().replace(/[\s_]+/g, "-");
+  const input = (orAbsent(raw) ?? "").trim().toLowerCase().replace(/[\s_]+/g, "-");
   return input.length > 0 ? input : undefined;
 }
 

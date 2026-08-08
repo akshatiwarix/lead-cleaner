@@ -19,6 +19,7 @@
  * confident wrong answer. The limitation is in the README.
  */
 
+import { isPlaceholder } from "./placeholder.ts";
 import type { NormalizedPhone, NormNote } from "../clean/types.ts";
 
 type Region = {
@@ -82,6 +83,10 @@ export function normalizePhone(raw: string | undefined, defaultRegion: string): 
   const notes: NormNote[] = [];
   const input = (raw ?? "").trim();
   if (input.length === 0) return { valid: false, notes };
+  if (isPlaceholder(input)) {
+    notes.push({ rule: "dropped a placeholder standing in for a missing number", from: input, to: "" });
+    return { valid: false, notes };
+  }
 
   let body = input;
   let extension: string | undefined;

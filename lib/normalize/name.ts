@@ -20,6 +20,7 @@
  * module beyond case and accent folding.
  */
 
+import { isPlaceholder } from "./placeholder.ts";
 import { soundex } from "../text/phonetic.ts";
 import { nameGroups } from "../text/nicknames.ts";
 import type { NormalizedName, NormNote } from "../clean/types.ts";
@@ -150,6 +151,12 @@ export function normalizeName(input: NameInput): NormalizedName {
     : (input.fullName ?? "").trim();
 
   if (source.length === 0) return { notes };
+  if (isPlaceholder(source)) {
+    // `n/a` in a name column would otherwise become a surname, and every other
+    // row with the same placeholder would match on it.
+    notes.push({ rule: "dropped a placeholder standing in for a missing name", from: source, to: "" });
+    return { notes };
+  }
 
   const folded = fold(source);
   if (folded !== source) {

@@ -17,6 +17,7 @@
  * has no way to audit the merge. Hence a `NormNote` per rewrite.
  */
 
+import { isPlaceholder } from "./placeholder.ts";
 import type { NormalizedEmail, NormNote } from "../clean/types.ts";
 
 /**
@@ -52,10 +53,20 @@ const FREEMAIL_DOMAINS = new Set([
   "btinternet.com", "sky.com", "virginmedia.com", "comcast.net", "verizon.net",
   "att.net", "sbcglobal.net", "bellsouth.net", "cox.net", "charter.net",
   "shaw.ca", "rogers.com", "telus.net", "bigpond.com", "optusnet.com.au",
+
+  // Reserved-domain stand-ins, listed so the bundled dataset can exercise the
+  // free-mail path without putting a real person's mailbox in a public repo.
+  // `.example` is reserved by RFC 2606 and can never be registered, so these
+  // cost nothing in production and keep data/leads.test.ts's "no real domain"
+  // assertion absolute.
+  "mailbox.example", "webmail.example",
 ]);
 
-/** Only these strip dots from the local part; elsewhere dots are significant. */
-const DOT_INSENSITIVE_DOMAINS = new Set(["gmail.com", "googlemail.com"]);
+/**
+ * Only these strip dots from the local part; elsewhere dots are significant.
+ * `mailbox.example` is the reserved stand-in for a dot-insensitive provider.
+ */
+const DOT_INSENSITIVE_DOMAINS = new Set(["gmail.com", "googlemail.com", "mailbox.example"]);
 
 /**
  * Deliberately permissive on the local part and strict about the shape: exactly
@@ -90,6 +101,12 @@ export function normalizeEmail(raw?: string): NormalizedEmail {
   const notes: NormNote[] = [];
   const input = (raw ?? "").trim();
   if (input.length === 0) return { kind: "missing", notes };
+  if (isPlaceholder(input)) {
+    // `unknown` is a missing address, not a malformed one — the distinction
+    // matters, because `invalid` reads as a data-quality problem to fix.
+    notes.push({ rule: "dropped a placeholder standing in for a missing address", from: input, to: "" });
+    return { kind: "missing", notes };
+  }
 
   // Exports arrive with display wrappers around the address more often than not.
   const normalized = input
