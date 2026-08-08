@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LeadCleaner — how it works (plain English)</title>
+<!--
+  Source for "LeadCleaner - how it works (plain English).pdf".
+
+  The layout deliberately copies the Day 001 handout so the three guides read as one
+  series: same title block, same numbered ten-section spine, same callout shapes, same
+  small-caps table headers, same footer line. Rendered with
+  `browse pdf --format letter`.
+-->
+<style>
+  @page { size: letter; margin: 0.85in 0.95in 0.7in; }
+
+  :root{
+    --ink:#1a1a1a; --body:#2c2c2c; --muted:#6b7280; --faint:#9ca3af;
+    --rule:#d8dbe0; --hair:#e8eaed; --wash:#f5f6f8;
+    --green:#15803d; --amber:#b45309; --rose:#be123c; --violet:#6d28d9;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; color:var(--body);
+    font:11px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  code, pre{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+
+  h1{font-size:27px; line-height:1.1; margin:0 0 9px; color:var(--ink); letter-spacing:-.02em; font-weight:700}
+  .standfirst{font-size:13px; line-height:1.5; color:#4b5563; margin:0 0 7px}
+  .kicker{font-size:9.5px; color:var(--faint); margin:0 0 18px}
+
+  h2{
+    font-size:13.5px; color:var(--ink); font-weight:700; margin:26px 0 0;
+    padding-bottom:6px; border-bottom:1px solid var(--rule);
+  }
+  h2 + *{margin-top:11px}
+  h3{font-size:11.5px; color:var(--ink); font-weight:700; margin:16px 0 5px}
+  p{margin:0 0 9px}
+
+  /* Left-bar callout on a wash — used for asides that qualify a claim. */
+  .bar{
+    background:var(--wash); border-left:3px solid var(--ink);
+    padding:11px 14px; margin:13px 0;
+  }
+  .bar p:last-child, .box p:last-child, .quote p:last-child{margin-bottom:0}
+
+  /* Bordered box with a small-caps label — used for the one idea per section. */
+  .box{border:1px solid #cfd3d9; border-radius:3px; padding:13px 15px; margin:14px 0}
+  .label{
+    font-size:8.5px; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--faint); margin:0 0 7px; font-weight:600;
+  }
+  .quote{border:1px dashed #b9bec6; border-radius:3px; padding:14px 16px; margin:14px 0}
+
+  pre{
+    background:var(--wash); border-radius:3px; padding:11px 13px; margin:12px 0;
+    font-size:9.5px; line-height:1.55; color:#374151; white-space:pre; overflow:visible;
+  }
+  code{font-size:9.5px; background:#eef0f3; padding:.5px 3px; border-radius:2px; color:#374151}
+  pre code{background:none; padding:0; font-size:inherit}
+
+  table{width:100%; border-collapse:collapse; margin:12px 0; font-size:10.5px}
+  th{
+    text-align:left; font-size:8.5px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--faint); font-weight:600; padding:0 12px 5px 0; border-bottom:1px solid var(--rule);
+  }
+  td{padding:7px 12px 7px 0; border-bottom:1px solid var(--hair); vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  th:last-child, td:last-child{padding-right:0}
+
+  ol.steps{list-style:none; margin:12px 0 0; padding:0; counter-reset:step}
+  ol.steps li{position:relative; padding:0 0 11px 25px; counter-increment:step}
+  ol.steps li::before{
+    content:counter(step); position:absolute; left:0; top:1px;
+    width:15px; height:15px; border-radius:50%; background:var(--ink); color:#fff;
+    font-size:8.5px; font-weight:600; text-align:center; line-height:15px;
+  }
+  ul{margin:9px 0; padding-left:16px}
+  li{margin-bottom:5px}
+
+  .g{color:var(--green); font-weight:600}
+  .a{color:var(--amber); font-weight:600}
+  .r{color:var(--rose); font-weight:600}
+  .v{color:var(--violet); font-weight:600}
+  strong{color:var(--ink); font-weight:600}
+  em{color:inherit}
+
+  .foot{
+    margin-top:26px; padding-top:11px; border-top:1px solid var(--rule);
+    font-size:9px; color:var(--faint);
+  }
+  h2, h3{break-after:avoid; page-break-after:avoid}
+  .box, .bar, .quote, pre, table{break-inside:avoid; page-break-inside:avoid}
+</style>
+</head>
+<body>
+
+<h1>LeadCleaner</h1>
+<p class="standfirst">A tool that works out how many actual people are in a messy lead list, merges the duplicates, and shows you why it merged each one.</p>
+<p class="kicker">A plain-English guide — what it does, how to drive it, and how to explain it to someone else.</p>
+
+<div class="bar">
+  <p><strong>Open it here:</strong> lead-cleaner-smoky.vercel.app — nothing to install, no sign-up, no API key. It loads with 150 messy rows already sorted out.</p>
+</div>
+
+<h2>1. The one-sentence version</h2>
+<p>You give it a lead list. It works out which rows are the same human, merges those, refuses the ones that only <em>look</em> like the same human, hands you the handful it genuinely cannot decide, and for every merge it shows you exactly which rows went in and which value won each field.</p>
+
+<div class="box">
+  <p class="label">The whole point</p>
+  <p>Most deduplication tools give you a slider: above this much similarity, merge. That framing is the problem, because "similar" and "the same person" are different claims. This one only merges automatically on hard facts — a shared mailbox, a shared phone line. Everything based on resemblance goes to you, however similar it looks.</p>
+</div>
+
+<h2>2. The two problems it fixes</h2>
+
+<h3>Problem one: a wrong merge cannot be undone</h3>
+<p>If the tool misses a duplicate, you have two records of one person. Annoying, visible, fixable next week.</p>
+<p>If the tool wrongly merges two people, it picks one email, one phone number, one job title, and the rest are gone. There is nothing left to compare against, so nobody notices. Six months later the founder's son has stopped receiving anything and no one can say why.</p>
+<p>Those two mistakes are not equally bad, so the tool does not treat them as equally bad. It will happily leave work on the table. It will not guess.</p>
+
+<h3>Problem two: nobody can check a merge they cannot see</h3>
+<p>A tool merges two contacts and gives you one row. Which email survived? Which one was thrown away? Which of the two job titles is on the record now? You cannot tell, so when a rep says "this is wrong" there is no way to settle it.</p>
+<p>Here, every merged record shows the rows that went into it, the reason they were joined, and for each field: what was kept, which row it came from, which rule decided, and <em>what lost</em>.</p>
+
+<h2>3. Three verdicts, not two</h2>
+<p>Every pair of rows lands in one of three buckets. The order matters: the first bucket is checked first and beats the other two.</p>
+
+<h3><span class="r">Refused</span> — cannot be the same person</h3>
+<p>Three things land here, and each one overrides an otherwise-automatic merge:</p>
+<ul>
+  <li><strong>You already said no.</strong> If you looked at a pair and rejected it, nothing overrules you — not a rule, not a score, not a re-run.</li>
+  <li><strong>Two work addresses at two different companies.</strong> This is either one person who changed jobs or two people who share a name, and <em>nothing in those two rows can tell you which</em>. Merging risks destroying a record; refusing costs a duplicate. So it refuses.</li>
+  <li><strong><code>Sr.</code> and <code>Jr.</code> disagree.</strong> Same name, same company, same email domain, and in the demo the same office line. Every similarity signal says one person. The suffix is the only field that says two.</li>
+</ul>
+
+<h3><span class="g">Merged automatically</span> — no question asked</h3>
+<p>Only two situations qualify. Note what they have in common — both are facts, not resemblances.</p>
+<table>
+  <thead><tr><th style="width:34%">The rule</th><th>What it needs, and the trap it avoids</th></tr></thead>
+  <tbody>
+    <tr><td><strong>The same personal mailbox</strong></td><td>Two rows with the same email address are the same person. One critical exception: a <em>shared</em> inbox like <code>info@</code> is not a person. Three people at a small firm all list <code>info@</code>, and merging them is the most common way real CRM data gets destroyed.</td></tr>
+    <tr><td><strong>The same phone line, plus a name that agrees, plus the same employer</strong></td><td>All three. A phone number on its own is a switchboard. And if two rows share a line but list <em>different extensions</em>, that is evidence of two desks — so it blocks the merge rather than allowing it.</td></tr>
+  </tbody>
+</table>
+
+<h3><span class="a">Probable</span> — you decide</h3>
+<p>Everything else that scores well enough: names that are close, companies that match, a shared web domain. These go into a queue with both rows side by side and every piece of evidence spelled out — surname 0.97, given name identical, company matches, domain matches. You click <em>same person</em> or <em>different people</em>.</p>
+
+<div class="bar">
+  <p><strong>There is no score high enough to escape this bucket.</strong> A 0.99 resemblance still asks. That is not timidity, it is the first problem above applied consistently.</p>
+</div>
+
+<h2>4. Which value wins when two rows disagree</h2>
+<p>Once two rows are one person, something has to decide what goes in the final record. Five questions, in order, and the first one that gives an answer wins.</p>
+<pre>1. Does only one row have a value?      That one wins.
+2. Is one value usable, the other not?  A phone number that parses beats
+                                        digits that don't.
+3. Which source do you trust more?      You set the order.
+4. Which is more recent?
+5. Still tied?                          Lowest row number. Never a coin flip.</pre>
+<p>Step 1 sounds too obvious to write down and it is the rule that matters most: a newer, better row that simply left a column blank must not erase that column.</p>
+<p>Step 3 sits above step 4 on purpose. <strong>"Newest wins" is the default almost everywhere and it is wrong for lead data</strong>, because the newest thing to touch a record is often a purchased list overwriting what your reps carefully entered.</p>
+
+<div class="box">
+  <p class="label">The single most useful screen in the tool</p>
+  <p>Open any merged record and you get a table: field, what was kept, which row it came from, which rule decided it, and <span class="a">what was overruled</span>.</p>
+  <p>There is a real example in the demo. Two rows for Gabriel Costa disagree about his phone number and his company. The record keeps the CRM export's values and displays the purchased list's values right next to them, flagged — even though the purchased list is <em>five months newer</em>.</p>
+  <p>Quietly picking a winner and discarding the loser is the same as deleting data. It just feels tidier.</p>
+</div>
+
+<h2>5. The rows it refuses to touch</h2>
+<p>Some rows have nothing that could identify a person. A company name and nothing else. A job title. An email address that is not an email address. The word <code>n/a</code> typed into a name field.</p>
+<p>These are <span class="v">quarantined</span> — set aside, listed with the reason, and, most importantly, <strong>still in the export</strong>, marked as held back.</p>
+<p>A tool that takes your 150 rows and hands back 144 without telling you which six it ate is worse than no tool at all. You cannot check work you cannot see.</p>
+
+<h2>6. What you're looking at on screen</h2>
+<p>A row of numbers across the top, then four tabs. The numbers move as you change anything.</p>
+<table>
+  <thead><tr><th style="width:34%">What you see</th><th>What it means</th></tr></thead>
+  <tbody>
+    <tr><td><strong>150 rows in → 100 people out</strong></td><td>What the list actually contains. 30.6% of the rows were duplicates.</td></tr>
+    <tr><td><span class="g">2 rows</span> on a record</td><td>This person was assembled from two rows of your file.</td></tr>
+    <tr><td><span class="a">3 conflicts</span></td><td>Three fields where the rows disagreed. Winner kept, losers shown.</td></tr>
+    <tr><td><code>authoritative</code></td><td>Joined on a mailbox or a phone line. No human needed.</td></tr>
+    <tr><td><code>human-linked</code></td><td>Joined because you said so.</td></tr>
+    <tr><td><strong>Review</strong> <span class="a">2</span></td><td>Pairs waiting on your decision. Never merged until you make one.</td></tr>
+    <tr><td><strong>Refused</strong> <span class="r">12</span></td><td>Pairs that cannot be the same person, each with the reason.</td></tr>
+    <tr><td><strong>Quarantine</strong> <span class="v">6</span></td><td>Rows with nothing to identify a person. Still in the export.</td></tr>
+    <tr><td><strong>91 comparisons</strong>, 0.88% of all-pairs</td><td>It compared 91 pairs instead of all 10,296. The saving and the risk, side by side.</td></tr>
+    <tr><td><strong>Auto precision 1.000</strong></td><td>It has never merged two different people. This is the number that has to be perfect.</td></tr>
+    <tr><td><strong>Auto recall 0.958</strong></td><td>It found 96% of the real duplicates on its own. The queue closes the rest.</td></tr>
+    <tr><td>A dash <strong>—</strong> in a field</td><td>That information is missing. It is never guessed at or filled in.</td></tr>
+  </tbody>
+</table>
+
+<h2>7. How to drive it — five things you'll actually do</h2>
+<ol class="steps">
+  <li><strong>Just read the list.</strong> It opens with 150 rows already resolved into 100 people, biggest merges first. Nothing to set up, no login.</li>
+  <li><strong>Open a merge and check its homework.</strong> Click any record. You get why those rows are one person, which value survived each field and why, what was overruled, and the original rows underneath. If the reasoning looks wrong to you, the tool is wrong, not you — press <em>not the same person</em>.</li>
+  <li><strong>Work the queue.</strong> Two pairs are waiting. Both rows are side by side with every piece of evidence. <em>Same person</em> merges them and takes the found-duplicates figure to 100%. <em>Different people</em> records a permanent "never merge these", which outranks every rule in the system.</li>
+  <li><strong>Drag the review threshold.</strong> Take it from 0.85 down to 0.60. The queue grows from 2 pairs to 9, and the "if you accepted all of it blindly" figure falls from 1.000 to 0.873 — meaning some of those suggestions are now wrong. Watch what does <em>not</em> move: automatic precision stays at 1.000, because the automatic merges never used that number.</li>
+  <li><strong>Drop in your own CSV.</strong> Column headings are matched automatically and shown to you. The file is read and cleaned inside your browser tab — it is not uploaded anywhere, and there is nowhere for it to go.</li>
+</ol>
+
+<h3>Two extras, both optional</h3>
+<p><strong>Turn blocking off.</strong> One checkbox makes it compare every possible pair instead of the 91 worth comparing. Same answer, 113 times the work. That equivalence is checked by an automated test, not just claimed here.</p>
+<p><strong>Export three files.</strong> <code>cleaned.csv</code> is one row per person with the held-back rows marked. <code>review.csv</code> is the pending pairs, to work through in a spreadsheet. <code>audit.json</code> contains the settings, your decisions and every piece of evidence — hand it to someone else and they can reproduce your exact result.</p>
+
+<h2>8. The part worth being proud of</h2>
+<p>There is no AI anywhere in this tool, and that is deliberate in a year when everything has AI bolted to it.</p>
+
+<div class="box">
+  <p class="label">Say this bit out loud in a demo</p>
+  <p>Every merge on the screen came from a rule you can read: these two rows share a mailbox, or they share a phone line and a name and an employer. Nothing was generated, nothing was estimated, nothing was a judgement call.</p>
+</div>
+
+<p>Why that matters commercially, in three practical terms:</p>
+<ul>
+  <li><strong>The same list today gives the same answer next year.</strong> On your machine and on mine. Nobody wakes up to a differently-merged database nobody can explain.</li>
+  <li><strong>You can defend a merge to the person who disagrees with it.</strong> Not "the tool did it" — the actual rule, the actual rows, and a file they can re-run to get the same result.</li>
+  <li><strong>Your file never leaves your computer.</strong> The whole thing runs inside the browser tab, because nothing in it needs a server. That is not a privacy feature bolted on; it falls out of the tool being simple arithmetic over rules.</li>
+</ul>
+<p>A language model asked whether two records are the same person will produce a confident answer, differently on Tuesday, with no way to check it. For this particular job that is the single worst failure mode available.</p>
+
+<h2>9. What it deliberately does not do</h2>
+<p>Every one of these is a choice rather than an oversight.</p>
+<table>
+  <thead><tr><th style="width:34%">It won't</th><th>Because</th></tr></thead>
+  <tbody>
+    <tr><td>Merge on similarity alone</td><td>However close two names are, a resemblance is not an identity. Those go to you.</td></tr>
+    <tr><td>Merge a job change between two work addresses</td><td>One person who moved and two people with one name are the same two rows. It refuses, and that is a real cost, stated rather than hidden.</td></tr>
+    <tr><td>Look up missing information</td><td>It cleans what you give it. Filling in blanks is a different job, and pretending to know something you don't is how a tool loses trust.</td></tr>
+    <tr><td>Tidy up job titles</td><td>Case and spacing only. Turning "VP Sales" and "Vice President, Sales" into one thing is its own project.</td></tr>
+    <tr><td>Merge companies</td><td>It works out people. Company records are a separate problem with a separate set of traps.</td></tr>
+    <tr><td>Remember anything</td><td>Nothing is saved. Refresh and you are back to the demo list. It is a thinking tool, not a system of record.</td></tr>
+    <tr><td>Handle a file bigger than memory</td><td>Everything happens in the browser tab, which is the same reason your data stays private.</td></tr>
+  </tbody>
+</table>
+
+<div class="bar">
+  <p><strong>The people in the demo are invented.</strong> 150 made-up rows covering 104 made-up people. Every web address ends in <code>.example</code>, which can never be a real internet address, and every phone number is in the range reserved for fiction. Publishing guessed-at contact details next to real names would be worse than obviously fake data.</p>
+</div>
+
+<h2>10. Explaining it to someone else in 30 seconds</h2>
+<div class="quote">
+  <p>"It takes a messy lead list and tells you how many actual people are in it. In the demo, 150 rows are 100 people."</p>
+  <p>"Two things make it different. First, it only merges by itself when it has a hard fact — the same mailbox, or the same phone line plus a matching name at the same company. Anything that just <em>looks</em> similar gets handed to you with the evidence, however similar it looks. Because a missed duplicate is annoying and a wrong merge is permanent — you lose one of the two people's details and nobody ever finds out."</p>
+  <p>"Second, every merge shows its working. Which rows went in, why they were joined, and for each field what was kept, where it came from, and what got overruled. So when a rep says 'that's wrong', you can settle it."</p>
+  <p>"No AI anywhere in it. Same list, same answer, every time — and the file never leaves your browser."</p>
+</div>
+<p>If they only remember one thing, make it this: <strong>similar is not the same person, and every merge shows its working.</strong></p>
+
+<h2>11. Quick answers</h2>
+
+<h3>Does it cost anything to run?</h3>
+<p>No. No account, no API key, no vendor, no network calls at all. There is nothing to pay for and nothing to break.</p>
+
+<h3>Can I break it by clicking around?</h3>
+<p>No. Push the threshold to 1.00 and the queue empties — the automatic merges are untouched, because they never read that number. Feed it a file with no recognisable columns and it tells you which headings it found instead of guessing.</p>
+
+<h3>Someone says a merge is wrong. What do I do?</h3>
+<p>Open the record and press <em>not the same person</em>. That is recorded permanently and outranks every rule in the system, including the automatic ones. It survives re-running and it travels in the exported audit file.</p>
+
+<h3>Why does it say 100 people when the demo has 104?</h3>
+<p>Because it found 96% of the duplicates by itself and is asking you about the rest rather than guessing. Decide the two queued pairs and it reaches all of them. It reports the number it can defend, not the number that looks best.</p>
+
+<h3>Is my file uploaded anywhere?</h3>
+<p>No. It is read and processed inside the browser tab. There is no server involved in cleaning, which is why the tool can make that promise rather than just asserting it.</p>
+
+<h3>Why did it leave six rows out?</h3>
+<p>Those six have nothing that could identify a person — a company name with no name, a job title on its own, <code>n/a</code> typed into a field. They are listed with the reason and they are still in the exported file, marked as held back. Nothing is ever silently dropped.</p>
+
+<h3>Is this ready to put in front of a customer?</h3>
+<p>It is a demonstration, on purpose. The logic, the merges and the explanations are real and tested. What is missing is the boring production plumbing: saving your work, logins, and connecting to your actual customer records.</p>
+
+<p class="foot">LeadCleaner — day 003 of a 100-day build challenge. Live at lead-cleaner-smoky.vercel.app · Written for a non-technical reader.</p>
+
+</body>
+</html>

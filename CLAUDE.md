@@ -138,6 +138,30 @@ two-item queue that reaches 1.000, 91 comparisons against 10,296 exhaustive
 whose queue still contains only true pairs. Do not nudge it without rerunning
 `npm run sweep` and updating the README's calibration table and its bolded row.
 
+## The two guides
+
+There are two plain-English write-ups and they are not duplicates of each other:
+
+- `docs/plain-english-guide.md` — prose, linked from the README, for a reader who
+  is already in the repo.
+- `docs/plain-english-pdf.html` — source for the printed handout that sits beside
+  Day 001's and Day 002's in `../` as
+  `LeadCleaner - how it works (plain English).pdf`. It deliberately copies Day
+  001's layout (title block, numbered section spine, callout shapes, small-caps
+  table headers, footer line) so the three read as one series. Regenerate with:
+
+```bash
+browse goto "file://$(pwd)/docs/plain-english-pdf.html"
+browse pdf /private/tmp/guide.pdf --format letter --print-background \
+  --footer-template '<div style="width:100%;text-align:center;font:9px sans-serif;color:#9ca3af"><span class="pageNumber"></span> of <span class="totalPages"></span></div>' \
+  --margin-top 0.85in --margin-bottom 0.7in --margin-left 0.95in --margin-right 0.95in
+cp /private/tmp/guide.pdf "../LeadCleaner - how it works (plain English).pdf"
+```
+
+`browse pdf` refuses paths outside the repo and `/private/tmp`, which is why it
+renders to tmp and then copies. **Both guides quote live numbers** — if the sweep
+moves, they move too.
+
 ## Data
 
 `data/leads.ts` is 150 synthetic rows on reserved `.example` domains, labelled
